@@ -7,13 +7,15 @@ class ChemistryCmisGrailsPlugin {
     def pluginExcludes = [
         "grails-app/views/error.gsp"
     ]
+    def loadAfter = ['services', 'controllers']
+
 
     // TODO Fill in these fields
-    def title = "Apache Chemistry CMIS plugin for Grails" // Headline display name of the plugin
+    def title = "OpenCMIS SDK Plugin" // Headline display name of the plugin
     def author = "Ludovik Lacroix"
     def authorEmail = "ludovik@lacroix.in"
     def description = '''\
-The Apache Chemistry CMIS plugin allows your grails application to use
+The OpenCMIS plugin allows your grails application to use
 open binding services with content repositories like Apache 
 InMemoryRepository and Alfresco server.
 It provides wrappers services around Apache Chemistry API for Java. Using the API, developers
@@ -21,7 +23,7 @@ can build content centric solutions.
 '''
 
     // URL to the plugin's documentation
-    def documentation = "https://github.com/llax/chemistry-cmis/blob/master/README.md"
+    def documentation = "https://github.com/webvibes/grails-opencmis/blob/master/README.md"
 
     // Extra (optional) plugin metadata
 
@@ -29,16 +31,16 @@ can build content centric solutions.
     def license = "APACHE"
 
     // Details of company behind the plugin (if there is one)
-    //def organization = [ name: "L2M", url: "http://www.lacroix.in" ]
+    def organization = [ name: "Webvibes", url: "http://www.webvibes.in" ]
 
     // Any additional developers beyond the author specified above.
     //def developers = [ [ name: "llax", email: "ludovik@lacroix.in" ]]
 
     // Location of the plugin's issue tracker.
-    //    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMYPLUGIN" ]
+    def issueManagement = [ system: "github", url: "https://github.com/webvibes/grails-opencmis/issues" ]
 
     // Online location of the plugin's browseable source code.
-    def scm = [ url: "https://github.com/llax/chemistry-cmis" ]
+    def scm = [ url: "https://github.com/webvibes/grails-opencmis" ]
 
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before

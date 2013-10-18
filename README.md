@@ -1,4 +1,6 @@
-chemistry-cmis
-==============
+grails-opencmis
+===============
 
-Grails plugin fo Apache Chemistry CMIS
+Grails plugin for OpenCMIS.
+Repositories Handler and Apache Chemistry binding services allow
+to integrate content centric solution with Grails framework.

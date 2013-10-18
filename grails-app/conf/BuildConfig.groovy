@@ -33,8 +33,18 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://repository.jboss.com/maven2/"
     }
     dependencies {
-        // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-        // runtime 'mysql:mysql-connector-java:5.1.24'
+        //build 'org.apache.httpcomponents:httpcore:4.3'
+        //build 'org.apache.httpcomponents:httpclient:4.3'
+        //runtime 'org.apache.httpcomponents:httpcore:4.3'
+        //runtime 'org.apache.httpcomponents:httpclient:4.3'
+        compile 'org.apache.chemistry.opencmis:chemistry-opencmis-commons-api:0.10.0'
+        compile 'org.apache.chemistry.opencmis:chemistry-opencmis-commons-impl:0.10.0'
+        compile 'org.apache.chemistry.opencmis:chemistry-opencmis-client-api:0.10.0'
+        compile 'org.apache.chemistry.opencmis:chemistry-opencmis-client-impl:0.10.0'
+        compile 'org.apache.chemistry.opencmis:chemistry-opencmis-client-bindings:0.10.0'
+        compile 'org.apache.chemistry.opencmis:chemistry-opencmis-server-support:0.10.0'
+        //compile 'org.apache.chemistry.opencmis:chemistry-opencmis-server-inmemory:0.10.0'
+
     }
 
     plugins {

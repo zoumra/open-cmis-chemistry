@@ -1,6 +1,6 @@
 class ChemistryCmisGrailsPlugin {
     // the plugin version
-    def version = "0.1-SNAPSHOT"
+    def version = "0.10.0-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.2.1 > *"
     // resources that are excluded from plugin packaging
@@ -13,7 +13,11 @@ class ChemistryCmisGrailsPlugin {
     def author = "Ludovik Lacroix"
     def authorEmail = "ludovik@lacroix.in"
     def description = '''\
-Apache Chemistry implementation for CMIS. Allows interaction with InMemoryRepository and Alfresco repositories.
+The Apache Chemistry CMIS plugin allows your grails application to use
+open binding services with content repositories like Apache 
+InMemoryRepository and Alfresco server.
+It provides wrappers services around Apache Chemistry API for Java. Using the API, developers
+can build content centric solutions.
 '''
 
     // URL to the plugin's documentation

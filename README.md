@@ -30,8 +30,9 @@ grails.plugin.opencmis.alfresco.cmisurl='cmis/versions/1.0/atom'
 grails.plugin.opencmis.alfresco.atomurl='https://api.alfresco.com/cmis/versions/1.0/atom'
 grails.plugin.opencmis.alfresco.tokenurl='https://api.alfresco.com/auth/oauth/versions/2/token'
 grails.plugin.opencmis.alfresco.authurl='https://api.alfresco.com/auth/oauth/versions/2/authorize'
+
 // Credentials
-grails.plugin.opencmis.alfresco.key='your_key'
+grails.plugin.opencmis.alfresco.key='your_key' 
 grails.plugin.opencmis.alfresco.secret='your_secret'
 
 

@@ -1,16 +1,11 @@
 package grails.plugin.opencmis
 
-import java.util.Collections
-import java.util.HashMap
-import java.util.List
-import java.util.Map
-
 import org.apache.chemistry.opencmis.client.bindings.spi.StandardAuthenticationProvider
 
-public class AuthenticationProviderService extends StandardAuthenticationProvider {
+class AuthenticationProviderService extends StandardAuthenticationProvider {
 
-@Override
-  public Map<String, List<String>> getHTTPHeaders(String url) {
+  @Override
+  Map<String, List<String>> getHTTPHeaders(String url) {
 
     Map<String, List<String>> headers = super.getHTTPHeaders(url)
     if (headers == null) {
@@ -23,12 +18,12 @@ public class AuthenticationProviderService extends StandardAuthenticationProvide
           Collections.singletonList((String) exampleUserObject))
     }
 
-    Object exampleSecretObject = getSession().get("org.example.secret");
+    Object exampleSecretObject = getSession().get("org.example.secret")
     if (exampleSecretObject instanceof String) {
       headers.put("example-secret",
           Collections.singletonList((String) exampleSecretObject))
     }
 
-    return headers;
+    return headers
   }
 }

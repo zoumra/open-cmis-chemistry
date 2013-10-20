@@ -10,22 +10,24 @@ import groovyx.net.http.*
 import static groovyx.net.http.ContentType.*
 import static groovyx.net.http.Method.*
 
-class Oauth2Controller {
-    // Inject link generator
+class ContentRepositoryController {
+
     LinkGenerator grailsLinkGenerator
+
     def repositoryHandlerService
     def grailsApplication
     
     def index() {
+
+    }
+
+    def alfrescoConnect() {
        if (session["accessToken"]) {
-           // Call list networks API (https://api.alfresco.com/)
            def accessToken = session["accessToken"]
            def http = new HTTPBuilder("https://api.alfresco.com/")
            http.setHeaders( [ "Authorization" : "Bearer " + accessToken ]) // Header based token passing (preferred)
 
            http.request(GET, JSON) {
-// headers.Accept = 'application/json'
-// uri.query = [ access_token : accessToken ] // Query string based token passing (NOT preferred)
               response.success = { response, json ->
                 log.debug "####SUCCESS:\n" + response.toString() + "\n\tBody:\n" + String.valueOf(json)
                 [ authenticated : true,
@@ -47,12 +49,12 @@ class Oauth2Controller {
                clientId : grailsApplication.config.grails?.plugin?.opencmis?.alfresco?.key,
                scope : grailsApplication.config.grails?.plugin?.opencmis?.alfresco?.scope,
                responseType : "code",
-               callbackURL : grailsLinkGenerator.link(action : "callback", absolute : true)
+               callbackURL : grailsLinkGenerator.link(action : "alfrescoCallback", absolute : true)
            ]
        }
     }
 
-    def callback() {
+    def alfrescoCallback() {
         def authCode = params.code
 
         if (!authCode) {
@@ -68,7 +70,7 @@ class Oauth2Controller {
                       "\tcode : " + authCode + "\n" +
                       "\tclient_id : " + apiKey + "\n" +
                       "\tclient_secret : " + secret + "\n" +
-                      "\tredirect_uri : " + grailsLinkGenerator.link(action : "callback", absolute : true) + "\n" +
+                      "\tredirect_uri : " + grailsLinkGenerator.link(action : "alfrescoCallback", absolute : true) + "\n" +
                       "\tgrant_type : authorization_code"
 
             http.request(POST, JSON) {
@@ -77,7 +79,7 @@ class Oauth2Controller {
               body = [ code : authCode,
                        client_id : apiKey,
                        client_secret : secret,
-                       redirect_uri : grailsLinkGenerator.link(action : "callback", absolute : true),
+                       redirect_uri : grailsLinkGenerator.link(action : "alfrescoCallback", absolute : true),
                        grant_type : "authorization_code" ]
               response.success = { response, json ->
                 session["accessToken"] = json["access_token"] // Note: shoving the token in the session is fine for a demo app, but _NOT_ ok in a real app!
@@ -89,37 +91,31 @@ class Oauth2Controller {
         }
     }
 
-    def resetSession() {
-      session.invalidate()
-      redirect(action: "index")
-    }
-
-
-    def network() {
+    def alfrescoCloud() {
       def networkId = params.id
       def accessToken = session["accessToken"]
 
       if (accessToken)
       {
          def session = repositoryHandlerService.connect('alfresco',accessToken)
-         def info = session.getRepositoryInfo()
-         log.info  "Repository Name: " + info.getName()
-        if(info) {
-          [ authenticated : true, success : true, repoName : info.getName() ]
+         def name = session.getRepositoryInfo().getName()
+         def rf = session.getRootFolder().getName()
+         
+        if(name && rf) {
+          [ authenticated : true, success : true, repoName : name , rootFolder: rf]
         }
-        /*repositoryHandlerService.callAlfrescoApi(
-            networkId,
-            accessToken,
-            { response, json -> [ authenticated : true, success : true, networkInfo : json.entry ]},
-            { response, reader -> [ authenticated : true, success : false, errorMessage : "HTTP Status Code ${response.getStatus()} returned by Alfresco" ] },
-            { exception -> [ authenticated : true, success : false, errorMessage : (exception == null ? "[nfo exception provided]" : "${exception.getClass().toString()}: ${exception.getMessage()}") ] })
-        */
+      
 
       }
       else
       {
         resetSession()
       }
+    }
+
+    def resetSession() {
+      session.invalidate()
+      redirect(action: "index")
     }
 
 }

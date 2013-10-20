@@ -2,7 +2,7 @@ class OpencmisGrailsPlugin {
     // the plugin version
     def version = "0.10.0-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "2.2.1 > *"
+    def grailsVersion = "2.3.0 > *"
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
         "grails-app/views/error.gsp"
@@ -17,7 +17,7 @@ class OpencmisGrailsPlugin {
     def description = '''\
 The OpenCMIS plugin allows your grails application to use
 open binding services with content repositories like Apache 
-InMemoryRepository and Alfresco server.
+InMemoryRepository and Alfresco Cloud network.
 It provides wrappers services around Apache Chemistry API for Java. Using the API, developers
 can build content centric solutions.
 '''

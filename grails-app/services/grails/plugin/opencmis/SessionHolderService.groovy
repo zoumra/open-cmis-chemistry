@@ -8,47 +8,37 @@ class SessionHolderService {
 	def repositoryHandlerService
 
     private static final String DEFAULT = 'default'
-    private static final Object[] LOCK = new Object[0]
-    private static final SessionHolderService INSTANCE
+    private static final Object LOCK = new Object()
+    // singleton
+    private static final SessionHolderService INSTANCE = new SessionHolderService()
 
     private final Map<String, Session> sessions = [:]
-    
-    // singleton
-    static {
-        INSTANCE = new SessionHolderService()
-    }
 
     static SessionHolderService getInstance() {
         INSTANCE
     }
 
     String[] getSessionNames() {
-        List<String> sessionNames = new ArrayList().addAll(sessions.keySet())
-        sessionNames.toArray(new String[sessionNames.size()])
+        sessions.keySet() as String[]
     }
 
     Session getSession(String sessionName = DEFAULT) {
-        if (isBlank(sessionName)) sessionName = DEFAULT
         retrieveSession(sessionName)
     }
 
     void setSession(String sessionName = DEFAULT, Session session) {
-        if (isBlank(sessionName)) sessionName = DEFAULT
         storeSession(sessionName, session)
     }
 
     boolean isSessionConnected(String sessionName) {
-        if (isBlank(sessionName)) sessionName = DEFAULT
         retrieveSession(sessionName) != null
     }
 
     void disconnectSession(String sessionName) {
-        if (isBlank(sessionName)) sessionName = DEFAULT
         storeSession(sessionName, null)
     }
 
     Session fetchSession(String sessionName) {
-        if (isBlank(sessionName)) sessionName = DEFAULT
         Session session = retrieveSession(sessionName)
         if (session == null) {
             session = repositoryHandlerService.instance.connect(sessionName)
@@ -61,15 +51,16 @@ class SessionHolderService {
     }
 
     private Session retrieveSession(String sessionName) {
+        if (!sessionName) sessionName = DEFAULT
         synchronized(LOCK) {
             sessions[sessionName]
         }
     }
 
     private void storeSession(String sessionName, Session session) {
+        if (!sessionName) sessionName = DEFAULT
         synchronized(LOCK) {
             sessions[sessionName] = session
         }
     }
-
 }

@@ -1,0 +1,20 @@
+<plugin name='opencmis' version='0.10.0-SNAPSHOT' grailsVersion='2.2.1 &gt; *'>
+  <author>Ludovik Lacroix</author>
+  <authorEmail>ludovik@lacroix.in</authorEmail>
+  <title>OpenCMIS SDK Plugin</title>
+  <description>The OpenCMIS plugin allows your grails application to use
+open binding services with content repositories like Apache 
+InMemoryRepository and Alfresco server.
+It provides wrappers services around Apache Chemistry API for Java. Using the API, developers
+can build content centric solutions.
+</description>
+  <documentation>https://github.com/webvibes/grails-opencmis/blob/master/README.md</documentation>
+  <type>OpencmisGrailsPlugin</type>
+  <resources>
+    <resource>grails.plugin.opencmis.ChemistryController</resource>
+    <resource>grails.plugin.opencmis.Oauth2Controller</resource>
+    <resource>grails.plugin.opencmis.AuthenticationProviderService</resource>
+    <resource>grails.plugin.opencmis.RepositoryHandlerService</resource>
+    <resource>grails.plugin.opencmis.SessionHolderService</resource>
+  </resources>
+</plugin>

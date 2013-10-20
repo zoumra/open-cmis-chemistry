@@ -1,4 +1,4 @@
-class ChemistryCmisGrailsPlugin {
+class OpencmisGrailsPlugin {
     // the plugin version
     def version = "0.10.0-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for

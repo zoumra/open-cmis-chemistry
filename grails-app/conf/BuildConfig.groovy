@@ -26,24 +26,22 @@ grails.project.dependency.resolution = {
         grailsCentral()
         mavenLocal()
         mavenCentral()
-        // uncomment the below to enable remote dependency resolution
-        // from public Maven repositories
-        //mavenRepo "http://repository.codehaus.org"
-        //mavenRepo "http://download.java.net/maven/2/"
-        //mavenRepo "http://repository.jboss.com/maven2/"
+        mavenRepo "http://repository.codehaus.org"
+        // Alfresco CMIS extensions
+        mavenRepo "http://maven.alfresco.com/nexus/content/groups/public" 
     }
     dependencies {
-        //build 'org.apache.httpcomponents:httpcore:4.3'
-        //build 'org.apache.httpcomponents:httpclient:4.3'
-        //runtime 'org.apache.httpcomponents:httpcore:4.3'
-        //runtime 'org.apache.httpcomponents:httpclient:4.3'
+        compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.5.2'
         compile 'org.apache.chemistry.opencmis:chemistry-opencmis-commons-api:0.10.0'
         compile 'org.apache.chemistry.opencmis:chemistry-opencmis-commons-impl:0.10.0'
         compile 'org.apache.chemistry.opencmis:chemistry-opencmis-client-api:0.10.0'
         compile 'org.apache.chemistry.opencmis:chemistry-opencmis-client-impl:0.10.0'
         compile 'org.apache.chemistry.opencmis:chemistry-opencmis-client-bindings:0.10.0'
         compile 'org.apache.chemistry.opencmis:chemistry-opencmis-server-support:0.10.0'
-        //compile 'org.apache.chemistry.opencmis:chemistry-opencmis-server-inmemory:0.10.0'
+        // Alfresco CMIS extension
+        compile 'org.alfresco.cmis.client:alfresco-opencmis-extension:0.7'
+
+
 
     }
 

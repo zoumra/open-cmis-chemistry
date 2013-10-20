@@ -19,6 +19,8 @@ class ContentRepositoryController {
     def grailsApplication
 
     def index() {
+      // FIXME: check session holder service
+      render view:'index'
     }
 
     def alfrescoConnect() {
@@ -110,6 +112,22 @@ class ContentRepositoryController {
         resetSession()
       }
     }
+
+  def chemistryInMemory() {
+    def session = repositoryHandlerService.connect('chemistry','noToken')
+    def name = session.getRepositoryInfo().getName()
+    def rf = session.getRootFolder().getName()
+    if(session) {
+        if(name && rf) {
+          [ authenticated : true, success : true, repoName : name , rootFolder: rf]
+        }
+      }
+      else
+      {
+        resetSession()
+      }
+  } 
+
 
     def resetSession() {
       session.invalidate()

@@ -60,10 +60,10 @@ class RepositoryHandlerService {
     def getChemistrySession(Map chemistryConfig) {
 
         if (cmisSession == null) {
-            def chemistryParams = [(SessionParameter.USER):config.user ?: 'username',
-                                   (SessionParameter.PASSWORD):config.password ?: 'password',
-                                   (SessionParameter.ATOMPUB_URL):config.atomurl ?: 'http://localhost:8081/inmemory/atom',
-                                   (SessionParameter.REPOSITORY_ID):config.repoid ?: 'A1',
+            def chemistryParams = [(SessionParameter.USER):chemistryConfig.user ?: 'username',
+                                   (SessionParameter.PASSWORD):chemistryConfig.password ?: 'password',
+                                   (SessionParameter.ATOMPUB_URL):chemistryConfig.atomurl ?: 'http://localhost:8081/inmemory/atom',
+                                   (SessionParameter.REPOSITORY_ID):chemistryConfig.repoid ?: 'A1',
                                    (SessionParameter.BINDING_TYPE):BindingType.ATOMPUB.value()]
 
             // Session factory

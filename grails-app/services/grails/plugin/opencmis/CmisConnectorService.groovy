@@ -17,7 +17,8 @@ class CmisConnectorService {
 
     def grailsApplication
 
-    private static SessionFactory sessionFactory = SessionFactoryImpl.newInstance()
+    private final static SessionFactory chemistrySessionFactory = SessionFactoryImpl.newInstance()
+    private final static SessionFactory alfrescoSessionFactory = SessionFactoryImpl.newInstance()
     private static Session cmisSessionChemistry
     private static Session cmisSessionAlfresco
 
@@ -86,7 +87,7 @@ class CmisConnectorService {
                                    (SessionParameter.BINDING_TYPE):BindingType.ATOMPUB.value()]
 
             // Session factory
-            cmisSessionChemistry = sessionFactory.createSession(chemistryParams)
+            cmisSessionChemistry = chemistrySessionFactory.createSession(chemistryParams)
         }
         cmisSessionChemistry
     }
@@ -99,7 +100,7 @@ class CmisConnectorService {
                                   (SessionParameter.HEADER+".0") : "Authorization: Bearer " + accessToken,
                                   (SessionParameter.OBJECT_FACTORY_CLASS) : "org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl"]
 
-            List<Repository> repositories = sessionFactory.getRepositories(alfrescoParams)
+            List<Repository> repositories = alfrescoSessionFactory.getRepositories(alfrescoParams)
             cmisSessionAlfresco = repositories[0].createSession()
         }
         cmisSessionAlfresco

@@ -11,43 +11,62 @@ import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl
 import org.apache.chemistry.opencmis.commons.SessionParameter
 import org.apache.chemistry.opencmis.commons.enums.BindingType
 
-class RepositoryHandlerService {
+import org.apache.chemistry.opencmis.commons.data.*
 
-    static transactional = false
+class CmisConnectorService {
 
     def grailsApplication
-    def sessionHolderService
 
-    private final SessionFactory sessionFactory = SessionFactoryImpl.newInstance()
-    private Session cmisSession
+    private static SessionFactory sessionFactory = SessionFactoryImpl.newInstance()
+    private static Session cmisSessionChemistry
+    private static Session cmisSessionAlfresco
 
-    private getChemistryConfig() {
-        grailsApplication.config.grails?.plugin?.opencmis?.chemistry
+    def getChemistryConfig() {
+        return grailsApplication.config.grails?.plugin?.opencmis?.chemistry
     }
 
-    private getAlfrescoConfig() {
-        grailsApplication.config.grails?.plugin?.opencmis?.alfresco
+    def getAlfrescoConfig() {
+        return grailsApplication.config.grails?.plugin?.opencmis?.alfresco 
     }
 
-    //TODO: JCR config
+    def connect(String repository,String accessToken) {
+        if(repository == 'chemistry') {
+            if(cmisSessionChemistry == null){ 
+                cmisSessionChemistry = getChemistrySession(chemistryConfig)
+            } else {
+                getCurrentChemistrySession()
+            }
+        } else if(repository == 'alfresco') {
+            if(cmisSessionAlfresco == null) {
+                this.cmisSessionAlfresco = getAlfrescoSession(alfrescoConfig,accessToken)
+            } else {
+                getCurrentAlfrescoSession()                
+            }
+        } else {
+            log.error "no repository defined"
+        }
+    }
 
-    def callAlfrescoApi(String apiPath, String accessToken, Closure onSuccess, Closure onFailure, Closure onException) {
+    public static Session getCurrentChemistrySession() {
+       return cmisSessionChemistry;
+    }
+
+     public static Session getCurrentAlfrescoSession() {
+       return cmisSessionAlfresco;
+    }
+
+    public static callAlfrescoApi(String apiPath, String accessToken, Closure onSuccess, Closure onFailure, Closure onException) {
 
         def url = "https://api.alfresco.com/" + (apiPath ?: "")
         def http = new HTTPBuilder(url)
         http.setHeaders( [ "Authorization" : "Bearer " + accessToken ]) // Header based token passing (preferred)
 
-        log.debug "About to GET ${url} with access token ${accessToken}"
-
         try {
             http.request(Method.GET, ContentType.JSON) {
-                // uri.query = [ access_token : accessToken ] // Query string based token passing (NOT preferred)
                 response.success = { response, json ->
-                    log.debug "####SUCCESS:\n$response\n\tBody:\n$json"
                     onSuccess(response, json)
                 }
                 response.failure = { response, reader ->
-                    log.debug "####FAILURE:\n$response" //+ "\n\tBody:\n$reader.text"
                     onFailure(response, reader)
                 }
             }
@@ -57,9 +76,9 @@ class RepositoryHandlerService {
         }
     }
 
-    def getChemistrySession(Map chemistryConfig) {
+    public static Session getChemistrySession(Map chemistryConfig) {
 
-        if (cmisSession == null) {
+        if (cmisSessionChemistry == null) {
             def chemistryParams = [(SessionParameter.USER):chemistryConfig.user ?: 'username',
                                    (SessionParameter.PASSWORD):chemistryConfig.password ?: 'password',
                                    (SessionParameter.ATOMPUB_URL):chemistryConfig.atomurl ?: 'http://localhost:8081/inmemory/atom',
@@ -67,13 +86,13 @@ class RepositoryHandlerService {
                                    (SessionParameter.BINDING_TYPE):BindingType.ATOMPUB.value()]
 
             // Session factory
-            cmisSession = sessionFactory.createSession(chemistryParams)
+            cmisSessionChemistry = sessionFactory.createSession(chemistryParams)
         }
-        cmisSession
+        cmisSessionChemistry
     }
 
-    def getAlfrescoSession(Map alfrescoConfig, String accessToken) {
-        if (cmisSession == null) {
+    public static Session getAlfrescoSession(Map alfrescoConfig, String accessToken) {
+        if (cmisSessionAlfresco == null) {
             def alfrescoParams = [(SessionParameter.ATOMPUB_URL) : alfrescoConfig.atomurl,
                                   (SessionParameter.BINDING_TYPE) : BindingType.ATOMPUB.value(),
                                   (SessionParameter.AUTH_HTTP_BASIC) : "false",
@@ -81,23 +100,24 @@ class RepositoryHandlerService {
                                   (SessionParameter.OBJECT_FACTORY_CLASS) : "org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl"]
 
             List<Repository> repositories = sessionFactory.getRepositories(alfrescoParams)
-            cmisSession = repositories[0].createSession()
+            cmisSessionAlfresco = repositories[0].createSession()
         }
-        cmisSession
+        cmisSessionAlfresco
     }
 
-    def connect(String repository,String accessToken) {
+    // Repository Info and capabilities
+    def getRepositoryInfo(Session cmisSession) {
+        RepositoryInfo repoInfo = cmisSession.getRepositoryInfo();
+        return repoInfo
+    }
 
-        if(repository == 'chemistry') {
-            cmisSession = getChemistrySession(chemistryConfig)
-        } else if(repository == 'alfresco'){
-            cmisSession = getAlfrescoSession(alfrescoConfig,accessToken)
-        } else {
-            log.error 'no repository defined'
-            cmisSession = null
-        }
+    def getRepositoryCaps(Session cmisSession) {
+        RepositoryCapabilities repoCaps =  cmisSession.getRepositoryInfo().getCapabilities();
+        return repoCaps
+    }
 
-        //sessionHolderService.instance.setSession(sessionName, session)
-        cmisSession
+    def getRootFolder(Session cmisSession) {
+        def repoRootFolder = cmisSession.getRootFolder()
+        return repoRootFolder
     }
 }

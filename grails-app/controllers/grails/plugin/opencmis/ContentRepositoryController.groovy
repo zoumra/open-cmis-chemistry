@@ -15,8 +15,9 @@ class ContentRepositoryController {
 
     LinkGenerator grailsLinkGenerator
 
-    def repositoryHandlerService
+    def cmisConnectorService
     def grailsApplication
+    def cmisCurrentSession
 
     def index() {
       // FIXME: check session holder service
@@ -97,27 +98,31 @@ class ContentRepositoryController {
       def networkId = params.id
       def accessToken = session["accessToken"]
 
-      if (accessToken)
-      {
-         def session = repositoryHandlerService.connect('alfresco',accessToken)
-         def name = session.getRepositoryInfo().getName()
-         def rf = session.getRootFolder().getName()
-
-        if(name && rf) {
-          [ authenticated : true, success : true, repoName : name , rootFolder: rf]
-        }
-      }
-      else
-      {
-        resetSession()
+      if (accessToken) {
+         cmisConnectorService.connect('alfresco',accessToken)
+         def alfrescoSession = cmisConnectorService.getCurrentAlfrescoSession()
+         def name = alfrescoSession.getRepositoryInfo().getName()
+         def rf = alfrescoSession.getRootFolder().getName()
+        if(alfrescoSession) { 
+            this.cmisCurrentSession = alfrescoSession
+            if(name && rf) {
+              [ authenticated : true, success : true, repoName : name , rootFolder: rf]
+            } else {
+              resetSession()
+            }
+        } 
+      } else {
+          log.error "connection error: no token available"
       }
     }
 
   def chemistryInMemory() {
-    def session = repositoryHandlerService.connect('chemistry','noToken')
-    def name = session.getRepositoryInfo().getName()
-    def rf = session.getRootFolder().getName()
-    if(session) {
+    cmisConnectorService.connect('chemistry','noToken')
+    def chemistrySession = cmisConnectorService.getCurrentChemistrySession()
+    def name = chemistrySession.getRepositoryInfo().getName()
+    def rf = chemistrySession.getRootFolder().getName()
+    if(chemistrySession) {
+        this.cmisCurrentSession = chemistrySession
         if(name && rf) {
           [ authenticated : true, success : true, repoName : name , rootFolder: rf]
         }
@@ -128,9 +133,13 @@ class ContentRepositoryController {
       }
   } 
 
-
-    def resetSession() {
-      session.invalidate()
-      redirect(action: "index")
+  def resetSession() {
+    if(cmisCurrentSession) {
+      cmisCurrentSession.clear()
+    } else {
+      log.info "no session to invalidate"
     }
+    redirect(action: "index")
+  }
+
 }

@@ -11,11 +11,9 @@ can build content centric solutions.
   <documentation>https://github.com/webvibes/grails-opencmis/blob/master/README.md</documentation>
   <type>OpencmisGrailsPlugin</type>
   <resources>
-    <resource>grails.plugin.opencmis.ContentRepositoryController</resource>
-    <resource>grails.plugin.opencmis.AuthenticationProviderService</resource>
+    <resource>grails.plugin.opencmis.ConnectionController</resource>
+    <resource>grails.plugin.opencmis.CmisAuthenticationProviderService</resource>
     <resource>grails.plugin.opencmis.CmisConnectorService</resource>
-    <resource>grails.plugin.opencmis.MetadaParserService</resource>
-    <resource>grails.plugin.opencmis.ObjectsHandlerService</resource>
-    <resource>grails.plugin.opencmis.QueryHandlerService</resource>
+    <resource>grails.plugin.opencmis.CmisRepositoryHelperService</resource>
   </resources>
 </plugin>

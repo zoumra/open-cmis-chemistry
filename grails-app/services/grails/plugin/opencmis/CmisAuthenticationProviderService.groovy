@@ -2,7 +2,9 @@ package grails.plugin.opencmis
 
 import org.apache.chemistry.opencmis.client.bindings.spi.StandardAuthenticationProvider
 
-class AuthenticationProviderService extends StandardAuthenticationProvider {
+class CmisAuthenticationProviderService extends StandardAuthenticationProvider {
+
+  static transactional = false
 
   @Override
   Map<String, List<String>> getHTTPHeaders(String url) {

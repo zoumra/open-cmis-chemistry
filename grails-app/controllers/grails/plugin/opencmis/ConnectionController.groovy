@@ -11,17 +11,29 @@ import org.apache.http.params.*
 import org.apache.http.protocol.*
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 
-class ContentRepositoryController {
+class ConnectionController {
+
+    private final static def INMEMORY_REPOSITORY = 'INMEMORY'
+    private final static def ALFRESCO_REPOSITORY = 'ALFRESCO'
 
     LinkGenerator grailsLinkGenerator
 
     def cmisConnectorService
+    def cmisRepositoryHelperService
     def grailsApplication
     def cmisCurrentSession
+    def repository
 
     def index() {
-      // FIXME: check session holder service
-      render view:'index'
+      // select the repository used in config
+      repository = cmisRepositoryHelperService.getRepository()
+      def rep
+      if(repository == INMEMORY_REPOSITORY || repository == ALFRESCO_REPOSITORY ) {
+        rep = repository
+      } else {
+        log.error "No repository set"
+      }
+      render view:'index',model:[rep:rep]
     }
 
     def alfrescoConnect() {
@@ -58,16 +70,15 @@ class ContentRepositoryController {
     }
 
     def alfrescoCallback() {
-        def authCode = params.code
-
-        if (!authCode) {
+        
+      def authCode = params.code
+      if (!authCode) {
             throw new Exception("authCode not provided to callback")
-        }
-
+      }
         // Exchange the auth code for an access token (we have a short period of time to do this)
-        def apiKey = grailsApplication.config.grails?.plugin?.opencmis?.alfresco?.key
-        def secret = grailsApplication.config.grails?.plugin?.opencmis?.alfresco?.secret
-        def http = new HTTPBuilder("https://api.alfresco.com/")
+      def apiKey = grailsApplication.config.grails?.plugin?.opencmis?.alfresco?.key
+      def secret = grailsApplication.config.grails?.plugin?.opencmis?.alfresco?.secret
+      def http = new HTTPBuilder("https://api.alfresco.com/")
 
 		  String alfrescoCallback = grailsLinkGenerator.link(action : "alfrescoCallback", absolute : true)
         log.debug "About to POST https://api.alfresco.com/auth/oauth/versions/2/token\n" +
@@ -77,7 +88,7 @@ class ContentRepositoryController {
                   "\tredirect_uri : $alfrescoCallback\n" +
                   "\tgrant_type : authorization_code"
 
-        http.request(POST, JSON) {
+      http.request(POST, JSON) {
           uri.path = "/auth/oauth/versions/2/token"
           requestContentType = ContentType.URLENC
           body = [ code : authCode,
@@ -85,13 +96,13 @@ class ContentRepositoryController {
                    client_secret : secret,
                    redirect_uri : alfrescoCallback,
                    grant_type : "authorization_code" ]
-          response.success = { response, json ->
+        response.success = { response, json ->
             session["accessToken"] = json["access_token"] // Note: shoving the token in the session is fine for a demo app, but _NOT_ ok in a real app!
             session["refreshToken"] = json["refresh_token"]
             log.debug "####SUCCESS:\n$response\n$json"
-          }
-          response.failure = { response -> log.debug "####FAILURE:\n$response" }
         }
+        response.failure = { response -> log.debug "####FAILURE:\n$response" }
+      }
     }
 
     def alfrescoCloud() {
@@ -99,12 +110,13 @@ class ContentRepositoryController {
       def accessToken = session["accessToken"]
 
       if (accessToken) {
-         cmisConnectorService.connect('alfresco',accessToken)
-         def alfrescoSession = cmisConnectorService.getCurrentAlfrescoSession()
-         def name = alfrescoSession.getRepositoryInfo().getName()
-         def rf = alfrescoSession.getRootFolder().getName()
-        if(alfrescoSession) { 
-            this.cmisCurrentSession = alfrescoSession
+         cmisConnectorService.connect(accessToken)
+         def cmisSession = cmisConnectorService.getCurrentSession()
+         def name = cmisSession.getRepositoryInfo().getName()
+         def rf = cmisSession.getRootFolder().getName()
+        if(cmisSession) { 
+            this.cmisCurrentSession = cmisSession
+            session['cmis'] = cmisSession
             if(name && rf) {
               [ authenticated : true, success : true, repoName : name , rootFolder: rf]
             } else {
@@ -118,12 +130,13 @@ class ContentRepositoryController {
     }
 
   def chemistryInMemory() {
-    cmisConnectorService.connect('chemistry','noToken')
-    def chemistrySession = cmisConnectorService.getCurrentChemistrySession()
-    def name = chemistrySession.getRepositoryInfo().getName()
-    def rf = chemistrySession.getRootFolder().getName()
-    if(chemistrySession) {
-        this.cmisCurrentSession = chemistrySession
+    cmisConnectorService.connect('noToken')
+    def cmisSession = cmisConnectorService.getCurrentSession()
+    def name = cmisSession.getRepositoryInfo().getName()
+    def rf = cmisSession.getRootFolder().getName()
+    if(cmisSession) {
+        this.cmisCurrentSession = cmisSession
+        session['cmis'] = cmisSession
         if(name && rf) {
           [ authenticated : true, success : true, repoName : name , rootFolder: rf]
         }

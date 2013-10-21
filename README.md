@@ -4,6 +4,10 @@ OpenCMIS for Grails
 Grails plugin for OpenCMIS.
 Repositories Handler and Apache Chemistry binding services allow
 to integrate content centric solution with Grails framework.
+
+Define the primary repository to be used with spring beans in your project's config (uppercase):
+grails.plugin.opencmis.repository='INMEMORY' // or ALFRESCO
+
  
 # Apache Chemistry InMemory
 
@@ -18,7 +22,7 @@ grails.plugin.opencmis.chemistry.repoid='A1'
 # Alfresco Cloud
 
 To enable Alfresco Cloud OAuth, it requires to retrieve callback, key and secret parameters from your Alfresco's developer account:
-Callback Url example => http://localhost:8080/{app.name}/contentRepository/alfrescoCallback
+Callback Url example => http://localhost:8080/{app.name}/connection/alfrescoCallback
 	
 For more information, visit https://developer.alfresco.com
 

@@ -23,7 +23,7 @@
         Your Alfresco Cloud&trade; networks:
         <ul>
         <g:each in="${networks.list.entries}">
-          <li><g:link controller="contentRepository" action="alfrescoCloud" id="${it.entry.id}">${it.entry.id}</g:link></li>
+          <li><g:link controller="connection" action="alfrescoCloud" id="${it.entry.id}">${it.entry.id}</g:link></li>
         </g:each>
       </ul>
       </g:if>
@@ -32,7 +32,7 @@
       </g:else>
     </p>
     <p>
-      <br/>&nbsp;Click <g:link controller="contentRepository" action="resetSession">here</g:link> if you'd like to invalidate your access token and start again.
+      <br/>&nbsp;Click <g:link controller="connection" action="resetSession">here</g:link> if you'd like to invalidate your access token and start again.
     </p>
   </g:if>
   <g:else>

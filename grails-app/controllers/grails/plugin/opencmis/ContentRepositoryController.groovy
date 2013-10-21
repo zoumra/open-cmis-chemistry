@@ -112,7 +112,8 @@ class ContentRepositoryController {
             }
         } 
       } else {
-          log.error "connection error: no token available"
+          log.debug "connection error: no token available"
+          return 
       }
     }
 
@@ -126,16 +127,14 @@ class ContentRepositoryController {
         if(name && rf) {
           [ authenticated : true, success : true, repoName : name , rootFolder: rf]
         }
-      }
-      else
-      {
+      } else {
         resetSession()
       }
   } 
 
   def resetSession() {
     if(cmisCurrentSession) {
-      cmisCurrentSession.clear()
+      cmisConnectorService.disconnect(cmisCurrentSession)
     } else {
       log.info "no session to invalidate"
     }

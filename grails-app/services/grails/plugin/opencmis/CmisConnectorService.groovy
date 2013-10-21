@@ -10,7 +10,6 @@ import org.apache.chemistry.opencmis.client.api.SessionFactory
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl
 import org.apache.chemistry.opencmis.commons.SessionParameter
 import org.apache.chemistry.opencmis.commons.enums.BindingType
-
 import org.apache.chemistry.opencmis.commons.data.*
 
 class CmisConnectorService {
@@ -45,6 +44,10 @@ class CmisConnectorService {
         } else {
             log.error "no repository defined"
         }
+    }
+
+    def disconnect(Session cmisSession) {
+        cmisSession = null
     }
 
     public static Session getCurrentChemistrySession() {
@@ -104,6 +107,10 @@ class CmisConnectorService {
         }
         cmisSessionAlfresco
     }
+
+
+
+
 
     // Repository Info and capabilities
     def getRepositoryInfo(Session cmisSession) {

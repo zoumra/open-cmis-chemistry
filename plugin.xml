@@ -14,6 +14,9 @@ can build content centric solutions.
     <resource>grails.plugin.opencmis.ConnectionController</resource>
     <resource>grails.plugin.opencmis.CmisAuthenticationProviderService</resource>
     <resource>grails.plugin.opencmis.CmisConnectorService</resource>
+    <resource>grails.plugin.opencmis.CmisDocumentHelperService</resource>
+    <resource>grails.plugin.opencmis.CmisFolderHelperService</resource>
+    <resource>grails.plugin.opencmis.CmisQueryHelperService</resource>
     <resource>grails.plugin.opencmis.CmisRepositoryHelperService</resource>
   </resources>
 </plugin>

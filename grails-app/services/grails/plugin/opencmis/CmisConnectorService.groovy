@@ -3,6 +3,9 @@ package grails.plugin.opencmis
 import static groovyx.net.http.ContentType.*
 import static groovyx.net.http.Method.*
 import groovyx.net.http.*
+import org.codehaus.groovy.grails.web.util.WebUtils
+
+import org.springframework.beans.factory.InitializingBean
 
 import org.apache.chemistry.opencmis.client.api.Repository
 import org.apache.chemistry.opencmis.client.api.Session
@@ -12,31 +15,62 @@ import org.apache.chemistry.opencmis.commons.SessionParameter
 import org.apache.chemistry.opencmis.commons.enums.BindingType
 import org.apache.chemistry.opencmis.commons.data.*
 
-class CmisConnectorService {
+class CmisConnectorService implements InitializingBean {
 
-    static transactional = false
-
+    // Repositories list
     private final static def INMEMORY_REPOSITORY = 'INMEMORY'
     private final static def ALFRESCO_REPOSITORY = 'ALFRESCO'
+
+    // Chemistry Session factory
     private final static SessionFactory sessionFactory = SessionFactoryImpl.newInstance()
-    
+
+    // Global props
+    static def cmisSession
     def grailsApplication
-    def cmisRepositoryHelperService
-    static Session cmisSession
+    def repositoryType
+    def chemistryConf
+    def alfrescoConf
+    
+
+    public void afterPropertiesSet() {
+        
+        def rt = grailsApplication.config.grails?.plugin?.opencmis?.repository
+        def cc = grailsApplication.config.grails?.plugin?.opencmis?.chemistry
+        def ac = grailsApplication.config.grails?.plugin?.opencmis?.alfresco 
+
+        if(rt && cc && ac){
+            this.repositoryType = rt
+            this.chemistryConf = cc
+            this.alfrescoConf = ac
+        } else {
+            log.error "No opencmis configuration defined."
+        }  
+    }
+
+    def getCurrentSession() {
+        if (!cmisSession) {
+             this.cmisSession = WebUtils.retrieveGrailsWebRequest().getSession().cmis
+        }
+        return this.cmisSession
+    }
+
+    def getRepositoryType() {
+        return this.repositoryType
+    }
 
     def getChemistryConfig() {
-        return grailsApplication.config.grails?.plugin?.opencmis?.chemistry
+        return this.chemistryConf
     }
 
     def getAlfrescoConfig() {
-        return grailsApplication.config.grails?.plugin?.opencmis?.alfresco 
+        return this.alfrescoConf
     }
 
     def connect(String accessToken) {
-        if(cmisSession == null) {
-            if(cmisRepositoryHelperService.getRepository() == INMEMORY_REPOSITORY) {
+        if(!cmisSession) {
+            if(repositoryType == INMEMORY_REPOSITORY) {
                 cmisSession = getChemistrySession(chemistryConfig)
-            } else if(cmisRepositoryHelperService.getRepository() == ALFRESCO_REPOSITORY) {
+            } else if(repositoryType == ALFRESCO_REPOSITORY) {
                 cmisSession = getAlfrescoSession(alfrescoConfig,accessToken)
             } else {
                 log.error "no repository defined"
@@ -48,10 +82,7 @@ class CmisConnectorService {
 
     def disconnect(Session cmisSession) {
         this.cmisSession = null
-    }
-
-    public static Session getCurrentSession() {
-       return this.cmisSession
+        return cmisSession
     }
 
     public static callAlfrescoApi(String apiPath, String accessToken, Closure onSuccess, Closure onFailure, Closure onException) {
@@ -77,7 +108,7 @@ class CmisConnectorService {
 
     public static Session getChemistrySession(Map chemistryConfig) {
 
-        if (cmisSession == null) {
+        if (!cmisSession) {
             def chemistryParams = [(SessionParameter.USER):chemistryConfig.user ?: 'username',
                                    (SessionParameter.PASSWORD):chemistryConfig.password ?: 'password',
                                    (SessionParameter.ATOMPUB_URL):chemistryConfig.atomurl ?: 'http://localhost:8081/inmemory/atom',
@@ -91,7 +122,7 @@ class CmisConnectorService {
     }
 
     public static Session getAlfrescoSession(Map alfrescoConfig, String accessToken) {
-        if (cmisSession == null) {
+        if (!cmisSession) {
             def alfrescoParams = [(SessionParameter.ATOMPUB_URL) : alfrescoConfig.atomurl,
                                   (SessionParameter.BINDING_TYPE) : BindingType.ATOMPUB.value(),
                                   (SessionParameter.AUTH_HTTP_BASIC) : "false",

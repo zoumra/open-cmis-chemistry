@@ -22,18 +22,22 @@ class ConnectionController {
     def cmisRepositoryHelperService
     def grailsApplication
     def cmisCurrentSession
-    def repository
 
     def index() {
-      // select the repository used in config
-      repository = cmisRepositoryHelperService.getRepository()
-      def rep
-      if(repository == INMEMORY_REPOSITORY || repository == ALFRESCO_REPOSITORY ) {
-        rep = repository
+      
+      def alf = 'alfrescoCloud'
+      def che = 'chemistryInMemory'
+      def rep = cmisRepositoryHelperService.getRepository()
+      def action
+
+      if(rep == INMEMORY_REPOSITORY) {
+          action = che
+      } else if(rep == ALFRESCO_REPOSITORY){
+          action = alf
       } else {
-        log.error "No repository set"
+        log.error "No repository set" 
       }
-      render view:'index',model:[rep:rep]
+      (cmisCurrentSession) ? redirect(action:action) : render(view:'index',model:[rep:rep])
     }
 
     def alfrescoConnect() {

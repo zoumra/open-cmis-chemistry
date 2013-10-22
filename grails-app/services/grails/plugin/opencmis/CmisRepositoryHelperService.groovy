@@ -10,38 +10,33 @@ import org.apache.chemistry.opencmis.client.api.*
 
 class CmisRepositoryHelperService implements InitializingBean {
 
-    static transactional = false
-
     RepositoryInfo repoInfo
     RepositoryCapabilities repoCaps
 
+    def cmisConnectorService
     def grailsApplication
 	def repoRootFolder
     def repository
     def cmisSession
 
     public void afterPropertiesSet() {
-        def repositoryConf = grailsApplication.config.grails?.plugin?.opencmis?.repository
-        if(repositoryConf){
-            this.repository = repositoryConf
-        } else {
-            log.error "No repository defined."
-        }
-        
+        this.repository = cmisConnectorService.getRepositoryType()
     }
 
-    def getCmisSession() {
-        this.cmisSession = WebUtils.retrieveGrailsWebRequest().getSession().cmis
+    def getCurrentSession() {
+        if (!cmisSession) {
+             this.cmisSession = WebUtils.retrieveGrailsWebRequest().getSession().cmis
+        }
         return cmisSession
     }
 
     def getRepository() {
-        return grailsApplication.config.grails?.plugin?.opencmis?.repository
+        return this.repository
     }
 
 	// Repository Info and capabilities
     def getRepositoryInfo() {
-        if(this.getCmisSession()) {
+        if(cmisSession) {
             this.repoInfo = cmisSession.getRepositoryInfo()
         } else {
             log.error "Open a connection first."
@@ -50,7 +45,7 @@ class CmisRepositoryHelperService implements InitializingBean {
     }
 
     def getRepositoryCaps() {
-        if(this.getCmisSession()) {
+        if(cmisSession) {
             this.repoCaps =  cmisSession.getRepositoryInfo().getCapabilities();
         } else {
             log.error "Open a connection first."
@@ -59,7 +54,7 @@ class CmisRepositoryHelperService implements InitializingBean {
     }
 
     def getRootFolder() {
-        if(this.getCmisSession()) {
+        if(cmisSession) {
             this.repoRootFolder = cmisSession.getRootFolder()
         } else {
             log.error "Open a connection first."
@@ -69,7 +64,7 @@ class CmisRepositoryHelperService implements InitializingBean {
 
     def showRootDescendants() {
         String desc = ""
-        if(this.getCmisSession()) {
+        if(cmisSession) {
             this.repoCaps =  cmisSession.getRepositoryInfo().getCapabilities();
             this.repoRootFolder = cmisSession.getRootFolder()
                 if (!this.repoCaps.isGetDescendantsSupported()) {

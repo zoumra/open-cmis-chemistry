@@ -1,5 +1,5 @@
 class OpencmisGrailsPlugin {
-    def version = "0.10.0-SNAPSHOT"
+    def version = "0.10.0.RC1"
     def grailsVersion = "2.0.0 > *"
     def loadAfter = ['services', 'controllers']
     def title = "OpenCMIS SDK Plugin"
